@@ -1,7 +1,6 @@
 package com.hyuseinlesho.contactservice.service;
 
 import com.hyuseinlesho.contactservice.dto.CreateContactDto;
-import com.hyuseinlesho.contactservice.mapper.ContactMapper;
 import com.hyuseinlesho.contactservice.model.Contact;
 import com.hyuseinlesho.contactservice.repository.ContactRepository;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,6 @@ public class ContactServiceTest {
     @Mock
     private ContactRepository contactRepository;
 
-    @Mock
-    private ContactMapper contactMapper;
-
     @InjectMocks
     private ContactService contactService;
 
@@ -36,14 +32,11 @@ public class ContactServiceTest {
                 .email(contactDto.getEmail())
                 .message(contactDto.getMessage()).build();
 
-        when(contactMapper.mapToContact(contactDto))
-                .thenReturn(contact);
         when(contactRepository.save(contact))
                 .thenReturn(contact);
 
         contactService.saveContact(contactDto);
 
-        verify(contactMapper, times(1)).mapToContact(contactDto);
         verify(contactRepository, times(1)).save(contact);
     }
 }
