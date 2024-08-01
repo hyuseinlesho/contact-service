@@ -21,7 +21,7 @@ public class ContactController {
         this.contactService = contactService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Void> saveContact(@RequestBody @Valid CreateContactDto contactDto) {
         contactService.saveContact(contactDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
