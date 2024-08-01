@@ -74,3 +74,12 @@ ContactService is a RESTful service designed to handle the creation and retrieva
     ```sh
     ./gradlew bootRun
     ```
+
+### API Documentation
+
+This project uses springdoc-openapi to generate API documentation.
+
+You can access the Swagger UI to explore and interact with the API by running the application and navigating to the following URL in your web browser:
+    ```
+    http://localhost:8080/swagger-ui.html
+    ```
