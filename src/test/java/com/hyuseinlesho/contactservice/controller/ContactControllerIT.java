@@ -1,8 +1,8 @@
 package com.hyuseinlesho.contactservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hyuseinlesho.contactservice.dto.CreateContactDto;
-import com.hyuseinlesho.contactservice.model.Contact;
+import com.hyuseinlesho.contactservice.model.dto.CreateContactDto;
+import com.hyuseinlesho.contactservice.model.entity.Contact;
 import com.hyuseinlesho.contactservice.repository.ContactRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.hyuseinlesho.contactservice.dto;
+package com.hyuseinlesho.contactservice.model.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

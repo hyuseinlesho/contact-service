@@ -1,13 +1,16 @@
 package com.hyuseinlesho.contactservice.service;
 
-import com.hyuseinlesho.contactservice.dto.CreateContactDto;
-import com.hyuseinlesho.contactservice.model.Contact;
+import com.hyuseinlesho.contactservice.model.dto.CreateContactDto;
+import com.hyuseinlesho.contactservice.model.entity.Contact;
 import com.hyuseinlesho.contactservice.producer.ContactProducer;
 import com.hyuseinlesho.contactservice.repository.ContactRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.concurrent.Delayed;
 
 @Service
 public class ContactService {
@@ -19,14 +22,18 @@ public class ContactService {
         this.contactProducer = contactProducer;
     }
 
-    public void saveContact(CreateContactDto contactDto) {
+    public Mono<Contact> saveContact(CreateContactDto contactDto) {
         Contact contact = mapToContact(contactDto);
-        contactRepository.save(contact);
         contactProducer.sendMessage(contact.toString());
+        return contactRepository.save(contact);
     }
 
-    public List<Contact> getNewContactsSince(LocalDateTime since) {
-        return contactRepository.findContactsSince(since);
+    public Flux<Contact> findAllContacts() {
+        return contactRepository.findAll();
+    }
+
+    public Flux<Contact> getNewContactsSince(LocalDateTime since) {
+        return contactRepository.findByCreatedAtAfter(since);
     }
 
     private static Contact mapToContact(CreateContactDto contactDto) {
