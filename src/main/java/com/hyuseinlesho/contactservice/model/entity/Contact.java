@@ -26,13 +26,4 @@ public class Contact {
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
-
-    @Override
-    public String toString() {
-        return "Contact{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
 }

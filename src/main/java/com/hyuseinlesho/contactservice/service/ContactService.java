@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.concurrent.Delayed;
 
 @Service
 public class ContactService {
@@ -24,8 +22,9 @@ public class ContactService {
 
     public Mono<Contact> saveContact(CreateContactDto contactDto) {
         Contact contact = mapToContact(contactDto);
-        contactProducer.sendMessage(contact.toString());
-        return contactRepository.save(contact);
+        contact.setCreatedAt(LocalDateTime.now());
+        return contactRepository.save(contact)
+                .doOnNext(contactProducer::sendMessage);
     }
 
     public Flux<Contact> findAllContacts() {
@@ -37,10 +36,10 @@ public class ContactService {
     }
 
     private static Contact mapToContact(CreateContactDto contactDto) {
-        Contact contact = new Contact();
-        contact.setName(contactDto.getName());
-        contact.setEmail(contactDto.getEmail());
-        contact.setMessage(contactDto.getMessage());
-        return contact;
+        return Contact.builder()
+                .name(contactDto.getName())
+                .email(contactDto.getEmail())
+                .message(contactDto.getMessage())
+                .build();
     }
 }
