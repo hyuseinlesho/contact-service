@@ -9,5 +9,5 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface ContactRepository extends ReactiveCrudRepository<Contact, Long> {
-    Flux<Contact> findByCreatedAtAfter(LocalDateTime since);
+    Flux<Contact> findAllByCreatedAtAfter(LocalDateTime since);
 }

@@ -21,15 +21,15 @@ public class ContactController {
     }
 
     @PostMapping("/create")
-    public Mono<Contact> saveContact(
+    public Mono<Contact> createContact(
             @RequestBody @Valid CreateContactDto contactDto
     ) {
-        return contactService.saveContact(contactDto);
+        return contactService.createContact(contactDto);
     }
 
     @GetMapping
-    public Flux<Contact> findAllContacts() {
-        return contactService.findAllContacts();
+    public Flux<Contact> getAllContacts() {
+        return contactService.getAllContacts();
     }
 
     @GetMapping("/since")

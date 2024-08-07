@@ -37,29 +37,24 @@ public class ContactServiceTest {
     }
 
     @Test
-    void saveContact() {
+    void createContact() {
         CreateContactDto contactDto = CreateContactDto.builder()
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .message("Test message.")
                 .build();
 
-        Contact contact = Contact.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
-                .message("Test message.")
-                .createdAt(LocalDateTime.now())
-                .build();
+        Contact contact = getContact1();
 
         when(contactRepository.save(any(Contact.class))).thenReturn(Mono.just(contact));
 
-        Mono<Contact> result = contactService.saveContact(contactDto);
+        Mono<Contact> result = contactService.createContact(contactDto);
 
         StepVerifier.create(result)
                 .expectNextMatches(savedContact -> {
                     assertThat(savedContact.getName()).isEqualTo("John Doe");
                     assertThat(savedContact.getEmail()).isEqualTo("john.doe@example.com");
-                    assertThat(savedContact.getMessage()).isEqualTo("Test message.");
+                    assertThat(savedContact.getMessage()).isEqualTo("Test message");
                     return true;
                 })
                 .expectComplete()
@@ -69,24 +64,29 @@ public class ContactServiceTest {
     }
 
     @Test
+    void getAllContacts_ReturnsContactFlux() {
+        Contact contact1 = getContact1();
+        Contact contact2 = getContact2();
+
+        when(contactRepository.findAll()).thenReturn(Flux.just(contact1, contact2));
+
+        Flux<Contact> result = contactService.getAllContacts();
+
+        StepVerifier.create(result)
+                .expectNext(contact1)
+                .expectNext(contact2)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
     void getNewContactsSince() {
         LocalDateTime since = LocalDateTime.now().minusDays(1);
 
-        Contact contact1 = Contact.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
-                .message("Test message")
-                .createdAt(LocalDateTime.now().minusHours(12))
-                .build();
+        Contact contact1 = getContact1();
+        Contact contact2 = getContact2();
 
-        Contact contact2 = Contact.builder()
-                .name("Test User")
-                .email("test.user@example.com")
-                .message("Another test message")
-                .createdAt(LocalDateTime.now().minusHours(6))
-                .build();
-
-        when(contactRepository.findByCreatedAtAfter(since)).thenReturn(Flux.just(contact1, contact2));
+        when(contactRepository.findAllByCreatedAtAfter(since)).thenReturn(Flux.just(contact1, contact2));
 
         Flux<Contact> result = contactService.getNewContactsSince(since);
 
@@ -95,5 +95,23 @@ public class ContactServiceTest {
                 .expectNextMatches(contact -> contact.getName().equals("Test User"))
                 .expectComplete()
                 .verify();
+    }
+
+    private static Contact getContact1() {
+        return Contact.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .message("Test message")
+                .createdAt(LocalDateTime.now().minusHours(12))
+                .build();
+    }
+
+    private static Contact getContact2() {
+        return Contact.builder()
+                .name("Test User")
+                .email("test.user@example.com")
+                .message("Another test message")
+                .createdAt(LocalDateTime.now().minusHours(6))
+                .build();
     }
 }

@@ -20,19 +20,19 @@ public class ContactService {
         this.contactProducer = contactProducer;
     }
 
-    public Mono<Contact> saveContact(CreateContactDto contactDto) {
+    public Mono<Contact> createContact(CreateContactDto contactDto) {
         Contact contact = mapToContact(contactDto);
         contact.setCreatedAt(LocalDateTime.now());
         return contactRepository.save(contact)
                 .doOnNext(contactProducer::sendMessage);
     }
 
-    public Flux<Contact> findAllContacts() {
+    public Flux<Contact> getAllContacts() {
         return contactRepository.findAll();
     }
 
     public Flux<Contact> getNewContactsSince(LocalDateTime since) {
-        return contactRepository.findByCreatedAtAfter(since);
+        return contactRepository.findAllByCreatedAtAfter(since);
     }
 
     private static Contact mapToContact(CreateContactDto contactDto) {

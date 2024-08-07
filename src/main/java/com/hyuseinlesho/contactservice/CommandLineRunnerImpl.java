@@ -3,7 +3,6 @@ package com.hyuseinlesho.contactservice;
 import com.hyuseinlesho.contactservice.model.dto.CreateContactDto;
 import com.hyuseinlesho.contactservice.service.ContactService;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
 //@Component
 public class CommandLineRunnerImpl implements CommandLineRunner {
@@ -22,7 +21,7 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
                     .email("john.doe" + i + "@example.com")
                     .message("Test message " + i)
                     .build();
-            contactService.saveContact(contactDto).subscribe();
+            contactService.createContact(contactDto).subscribe();
         }
     }
 }
