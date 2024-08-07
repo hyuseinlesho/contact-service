@@ -36,33 +36,18 @@ ContactService is a reactive RESTful service designed to handle the creation and
 1. Clone the repository:
     ```sh
     git clone https://github.com/hyuseinlesho/contact-service.git
-    cd contact-service
     ```
 
-2. Update the `application.yaml` file with your database connection details and other configurations:
-    ```yaml
-    spring:
-      r2dbc:
-        url: r2dbc:mysql://localhost:3306/contact_service
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-      flyway:
-        url: jdbc:mysql://localhost:3306/contact_service
-        user: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-    
-    kafka:
-      bootstrap-servers: localhost:9092
-      topic: contact-topic
-    ```
-
-3. Set environment variables for your database username and password:
+2. Set environment variables for your database username and password:
     ```sh
-    export DB_USERNAME=your_username
-    export DB_PASSWORD=your_password
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
     ```
 
-4. Create contact_service database
+3. Create contact_service database
+    ```sql
+    create schema contact_service;
+    ```
 
 5. Install and run Apache Kafka server.
 
@@ -96,14 +81,7 @@ You can access the Swagger UI to explore and interact with the API by running th
 
 - **Database Migrations**: Uses Flyway to handle database schema migrations.
 - **Initial Migration**: Schema defined in `resources/db/migration/V1__init.sql`:
-    ```sql
-    CREATE TABLE contacts (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        message TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    ```
+
+![contacts-schema](https://github.com/user-attachments/assets/798516da-5308-46cf-9a55-2da2a805272a)
 
 This setup allows the ContactService to handle real-time notifications and efficient management of user contacts.
