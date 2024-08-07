@@ -20,7 +20,7 @@ public class ContactProducer {
     public void sendMessage(Contact contact) {
         try {
             String message = objectMapper.writeValueAsString(contact);
-            kafkaTemplate.send("contact-topic", message);
+            kafkaTemplate.send(TOPIC, message);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize contact to JSON", e);
         }
