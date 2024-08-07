@@ -64,10 +64,7 @@ ContactService is a reactive RESTful service designed to handle the creation and
 
 4. Install and run Apache Kafka server.
 
-5. Build and run the application:
-    ```sh
-    ./gradlew bootRun
-    ```
+5. Run the application.
 
 ### API Documentation
 
