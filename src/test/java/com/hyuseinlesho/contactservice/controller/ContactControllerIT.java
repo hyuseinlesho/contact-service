@@ -47,7 +47,7 @@ public class ContactControllerIT {
     }
 
     @Test
-    public void testCreateContact() {
+    public void createContact() {
         when(contactService.createContact(createContactDto)).thenReturn(Mono.just(contact));
 
         webTestClient.post()
@@ -58,7 +58,7 @@ public class ContactControllerIT {
     }
 
     @Test
-    public void testGetAllContacts() {
+    public void getAllContacts() {
         when(contactService.getAllContacts()).thenReturn(Flux.just(contact));
 
         webTestClient.get()
@@ -74,7 +74,7 @@ public class ContactControllerIT {
     }
 
     @Test
-    public void testGetNewContactsSince() {
+    public void getNewContactsSince() {
         LocalDateTime since = LocalDateTime.now().minusDays(1);
         when(contactService.getNewContactsSince(since)).thenReturn(Flux.just(contact));
 
