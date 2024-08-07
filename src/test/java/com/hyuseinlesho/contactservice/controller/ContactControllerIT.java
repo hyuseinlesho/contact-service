@@ -1,80 +1,95 @@
 package com.hyuseinlesho.contactservice.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hyuseinlesho.contactservice.model.dto.CreateContactDto;
 import com.hyuseinlesho.contactservice.model.entity.Contact;
-import com.hyuseinlesho.contactservice.repository.ContactRepository;
+import com.hyuseinlesho.contactservice.service.ContactService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebFluxTest(controllers = ContactController.class)
+@Import(ContactService.class)
 public class ContactControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
+    private WebTestClient webTestClient;
 
-    @Autowired
-    private ContactRepository contactRepository;
+    @MockBean
+    private ContactService contactService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private CreateContactDto createContactDto;
+    private Contact contact;
 
     @BeforeEach
-    void setUp() {
-        contactRepository.deleteAll();
+    public void setup() {
+        createContactDto = CreateContactDto.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .message("Test message.")
+                .build();
+        contact = Contact.builder()
+                .id(1L)
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .message("Test message.")
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     @Test
-    void saveContact() throws Exception {
-        CreateContactDto contactDto = CreateContactDto.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
-                .message("Test message.").build();
+    public void testCreateContact() {
+        when(contactService.createContact(createContactDto)).thenReturn(Mono.just(contact));
 
-        mockMvc.perform(post("/api/contacts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(contactDto)))
-                .andExpect(status().isCreated());
+        webTestClient.post()
+                .uri("/api/contacts/create")
+                .bodyValue(createContactDto)
+                .exchange()
+                .expectStatus().isOk();
     }
 
     @Test
-    void getNewContactsSince() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        Contact contact1 = Contact.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
-                .message("Test message")
-                .createdAt(LocalDateTime.now().minusHours(2)).build();
+    public void testGetAllContacts() {
+        when(contactService.getAllContacts()).thenReturn(Flux.just(contact));
 
-        Contact contact2 = Contact.builder()
-                .name("Test User")
-                .email("test.user@example.com")
-                .message("Another test message")
-                .createdAt(LocalDateTime.now().minusHours(1)).build();
+        webTestClient.get()
+                .uri("/api/contacts")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(contact.getId())
+                .jsonPath("$[0].name").isEqualTo(contact.getName())
+                .jsonPath("$[0].email").isEqualTo(contact.getEmail())
+                .jsonPath("$[0].message").isEqualTo(contact.getMessage())
+                .jsonPath("$[0].createdAt").isNotEmpty();
+    }
 
-        contactRepository.saveAll(List.of(contact1, contact2));
+    @Test
+    public void testGetNewContactsSince() {
+        LocalDateTime since = LocalDateTime.now().minusDays(1);
+        when(contactService.getNewContactsSince(since)).thenReturn(Flux.just(contact));
 
-        String since = now.minusDays(1).format(DateTimeFormatter.ISO_DATE_TIME);
-
-        mockMvc.perform(get("/api/contacts/since")
-                        .param("since", since)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("John Doe"))
-                .andExpect(jsonPath("$[1].name").value("Test User"));
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/contacts/since")
+                        .queryParam("since", since.toString())
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(contact.getId())
+                .jsonPath("$[0].name").isEqualTo(contact.getName())
+                .jsonPath("$[0].email").isEqualTo(contact.getEmail())
+                .jsonPath("$[0].message").isEqualTo(contact.getMessage())
+                .jsonPath("$[0].createdAt").isNotEmpty();
     }
 }
