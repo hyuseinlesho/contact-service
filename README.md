@@ -62,9 +62,11 @@ ContactService is a reactive RESTful service designed to handle the creation and
     export DB_PASSWORD=your_password
     ```
 
-4. Install and run Apache Kafka server.
+4. Create contact_service database
 
-5. Run the application.
+5. Install and run Apache Kafka server.
+
+6. Run the application.
 
 ### API Documentation
 
